@@ -6,6 +6,7 @@
  */
 
 
+#include <stdint.h>
 #include "oscillator.h"
 #include "pp6.h"
 #include "audio.h"

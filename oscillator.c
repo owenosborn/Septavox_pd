@@ -5,52 +5,55 @@
  *      Author: owen
  */
 
+#include <stdint.h>
 #include "oscillator.h"
 #include "waves.h"
 
-uint8_t wavetable_selector = 0;   //TODO:  no globals please,
+#define PI 3.14159265359f
 
-float32_t arm_sin_f32(float32_t x);
+uint8_t wavetable_selector = 0;   
+
+float arm_sin_f32(float x);
 
 
 /*
  * phasor oscillator
  */
-void phasor_set(phasor * p, float32_t freq) {
+void phasor_set(phasor * p, float freq) {
 	p->phase_step = (uint32_t) (freq * (2147483648.0f / SR));
 }
 
-float32_t phasor_process(phasor * p){
+float phasor_process(phasor * p){
 	// just let it roll over
 	p->phase += p->phase_step;
-	return (((float32_t) p->phase / 2147483648.0f) + 1.f) * .5f;
+	return (((float) p->phase / 2147483648.0f) + 1.f) * .5f;
 }
 
 
 /*
  * sawtooth oscillator
  */
-void sawtooth_set(sawtooth_oscillator * saw, float32_t freq, float32_t amp) {
+void sawtooth_set(sawtooth_oscillator * saw, float freq, float amp) {
 	saw->phase_step = (uint32_t) (freq * (2147483648.0f / SR));
 	saw->amplitude = amp;
 }
 
-float32_t sawtooth_process(sawtooth_oscillator * saw){
+float sawtooth_process(sawtooth_oscillator * saw){
 	// just let it roll over
 	saw->phase += saw->phase_step;
-	return ((float32_t) saw->phase / 2147483648.0f) * saw->amplitude;
+	return ((float) saw->phase / 2147483648.0f) * saw->amplitude;
 }
 
 /*
  * square oscillator
  */
-void squarewave_set(square_oscillator * square, float32_t freq, float32_t amp) {
+void squarewave_set(square_oscillator * square, float freq, float amp) {
 	square->phase_step = (uint32_t) (freq * (2147483648.0f / SR));
 	square->amplitude = amp;
 }
 
-float32_t squarewave_process(square_oscillator * square){
-	float32_t squarewave;
+float squarewave_process(square_oscillator * square){
+	float squarewave;
 	// just let it roll over
 	square->phase += square->phase_step;
 	if (square->phase > 0) squarewave = 1.0f;
@@ -72,30 +75,30 @@ void sin_reset(sin_oscillator * oscil){
 	oscil->phase = 0;
 }
 
-void sin_set(sin_oscillator * oscil, float32_t freq, float32_t amp){
+void sin_set(sin_oscillator * oscil, float freq, float amp){
 	if (freq < 0) freq *= -1.f;
 
 	oscil->phase_step = (uint32_t) (freq * (2147483648.0f / SR));
 	oscil->amplitude_target = amp;
 }
 
-float32_t sin_process(sin_oscillator * oscil){
+float sin_process(sin_oscillator * oscil){
 
-	float32_t phase;
+	float phase;
 
 	oscil->amplitude = oscil->amplitude_target;
 	oscil->phase += oscil->phase_step;
-	phase = (((float32_t) oscil->phase / 2147483648.0f) + 1.0f) * PI;
+	phase = (((float) oscil->phase / 2147483648.0f) + 1.0f) * PI;
 
 	return arm_sin_f32(phase) * oscil->amplitude;
 
 }
 
-float32_t sin_process_simple(sin_oscillator * oscil){
+float sin_process_simple(sin_oscillator * oscil){
 
 	uint32_t phase;
 
-	float32_t ym1, y, yp1, yp2, frac;
+	float ym1, y, yp1, yp2, frac;
 
 	phase = ((oscil->phase_accum >> 24) & 0xff) + 1;
 
@@ -105,7 +108,7 @@ float32_t sin_process_simple(sin_oscillator * oscil){
 	yp2 = sinTable[wavetable_selector][phase + 2];
 
 
-	frac =  (float32_t) (oscil->phase_accum & 0x00FFFFFF) / 16777216.f;
+	frac =  (float) (oscil->phase_accum & 0x00FFFFFF) / 16777216.f;
 
 
 	oscil->phase_accum += oscil->phase_step;
@@ -124,12 +127,12 @@ static inline float cube_interp(float fr, float inm1, float
 	 fr * (3.0f * (in - inp1) - inm1 + inp2)));
 }
 
-float32_t simple_sin(float32_t freq) {
+float simple_sin(float freq) {
 	static uint32_t phase_accum;
 	uint32_t phase;
 	uint32_t phase_step = (uint32_t) (freq * (2147483648.0f / SR));
 
-	float32_t ym1, y, yp1, yp2, frac;
+	float ym1, y, yp1, yp2, frac;
 
 	phase = ((phase_accum >> 24) & 0xff) + 1;
 
@@ -143,7 +146,7 @@ float32_t simple_sin(float32_t freq) {
 	//yp1 = saw_table[phase + 1];
 	//yp2 = saw_table[phase + 2];
 
-	frac =  (float32_t) (phase_accum & 0x00FFFFFF) / 16777216.f;
+	frac =  (float) (phase_accum & 0x00FFFFFF) / 16777216.f;
 
 
 	phase_accum += phase_step;
@@ -152,7 +155,7 @@ float32_t simple_sin(float32_t freq) {
 }
 
 // single FM
-float32_t simple_FM(float32_t freq, float32_t harmonicity, float32_t index) {
+float simple_FM(float freq, float harmonicity, float index) {
 
 	static uint32_t modulator_phase_accum;
 	static uint32_t carrier_phase_accum;
@@ -161,7 +164,7 @@ float32_t simple_FM(float32_t freq, float32_t harmonicity, float32_t index) {
 	uint32_t carrier_phase;
 	int32_t carrier_phase_step; // this is a signed int because its sometimes negative frequency
 
-	float32_t  y, yp1, frac, modulator, carrier;
+	float  y, yp1, frac, modulator, carrier;
 
 	// modulator frequency = f * harmonicity
 	modulator_phase_step = (uint32_t) (freq * (2147483648.0f / SR) * harmonicity);
@@ -169,7 +172,7 @@ float32_t simple_FM(float32_t freq, float32_t harmonicity, float32_t index) {
 	modulator_phase = ((modulator_phase_accum >> 24) & 0xff) + 1;
 	y = sin_table[modulator_phase];
 	yp1 = sin_table[modulator_phase + 1];
-	frac =  (float32_t) (modulator_phase_accum & 0x00FFFFFF) / 16777216.f;
+	frac =  (float) (modulator_phase_accum & 0x00FFFFFF) / 16777216.f;
 	modulator_phase_accum += modulator_phase_step;
 	modulator = y + frac * (yp1 - y);
 
@@ -186,7 +189,7 @@ float32_t simple_FM(float32_t freq, float32_t harmonicity, float32_t index) {
 	carrier_phase = ((carrier_phase_accum >> 24) & 0xff) + 1;
 	y = sin_table[carrier_phase];
 	yp1 = sin_table[carrier_phase + 1];
-	frac =  (float32_t) (carrier_phase_accum & 0x00FFFFFF) / 16777216.f;
+	frac =  (float) (carrier_phase_accum & 0x00FFFFFF) / 16777216.f;
 	carrier_phase_accum += carrier_phase_step;
 
 	// interpolate
@@ -195,10 +198,10 @@ float32_t simple_FM(float32_t freq, float32_t harmonicity, float32_t index) {
 	return carrier;
 }
 
-float32_t FM_oscillator_process (FM_oscillator * fm_osc, float32_t freq, float32_t harmonicity, float32_t index) {
+float FM_oscillator_process (FM_oscillator * fm_osc, float freq, float harmonicity, float index) {
 
 
-	float32_t  y, yp1, frac, modulator, carrier;
+	float  y, yp1, frac, modulator, carrier;
 
 	// modulator frequency = f * harmonicity
 	fm_osc->modulator_phase_step = (uint32_t) (freq * (2147483648.0f / SR) * harmonicity);
@@ -206,7 +209,7 @@ float32_t FM_oscillator_process (FM_oscillator * fm_osc, float32_t freq, float32
 	fm_osc->modulator_phase = ((fm_osc->modulator_phase_accum >> 24) & 0xff) + 1;
 	y = sinTable[0][fm_osc->modulator_phase];
 	yp1 = sinTable[0][fm_osc->modulator_phase + 1];
-	frac =  (float32_t) (fm_osc->modulator_phase_accum & 0x00FFFFFF) / 16777216.f;
+	frac =  (float) (fm_osc->modulator_phase_accum & 0x00FFFFFF) / 16777216.f;
 	fm_osc->modulator_phase_accum += fm_osc->modulator_phase_step;
 	modulator = y + frac * (yp1 - y);
 
@@ -223,7 +226,7 @@ float32_t FM_oscillator_process (FM_oscillator * fm_osc, float32_t freq, float32
 	fm_osc->carrier_phase = ((fm_osc->carrier_phase_accum >> 24) & 0xff) + 1;
 	y = sinTable[wavetable_selector][fm_osc->carrier_phase];
 	yp1 = sinTable[wavetable_selector][fm_osc->carrier_phase + 1];
-	frac =  (float32_t) (fm_osc->carrier_phase_accum & 0x00FFFFFF) / 16777216.f;
+	frac =  (float) (fm_osc->carrier_phase_accum & 0x00FFFFFF) / 16777216.f;
 	fm_osc->carrier_phase_accum += fm_osc->carrier_phase_step;
 
 	// interpolate
@@ -235,21 +238,21 @@ float32_t FM_oscillator_process (FM_oscillator * fm_osc, float32_t freq, float32
 //TODO : it seems these bl oscillators can't handle a 0 freq  (since it would ential a divide by 0),  so maybe check for 0 freq
 
 // step table, floating index
-float32_t bl_step_table_read(float32_t index) {
+float bl_step_table_read(float index) {
 	uint32_t table_index;
-	float32_t frac;
-	float32_t y, yp1;
+	float frac;
+	float y, yp1;
 
 	table_index = (uint32_t) index;
 
-	frac = (float32_t) table_index - index;
+	frac = (float) table_index - index;
 
 	y = transition_table[table_index];
 	yp1 = transition_table[table_index + 1];
 	return y + frac * (yp1 - y);
 }
 
-void bl_saw_set(bl_saw * saw, float32_t freq) {
+void bl_saw_set(bl_saw * saw, float freq) {
 	saw->phase_step = (uint32_t) (freq * (2147483648.0f / SR));
 	saw->freq = freq;
 }
@@ -259,13 +262,13 @@ void bl_saw_reset(bl_saw * saw){
 }
 
 // from PD patch, transition table is used for the step
-float32_t bl_saw_process(bl_saw * saw){
+float bl_saw_process(bl_saw * saw){
 
-	float32_t sig;
-	float32_t transition_table_index;
+	float sig;
+	float transition_table_index;
 
 	saw->phase += saw->phase_step;
-	sig = ((((float32_t) saw->phase / 2147483648.0f) + 1.f) * .5f) - .5f;
+	sig = ((((float) saw->phase / 2147483648.0f) + 1.f) * .5f) - .5f;
 	//sig -= .5f;
 
 	// scale it, numerator controls the band limit
@@ -281,7 +284,7 @@ float32_t bl_saw_process(bl_saw * saw){
 	return bl_step_table_read(transition_table_index) - sig;
 }
 
-void bl_square_set(bl_square * square, float32_t freq){
+void bl_square_set(bl_square * square, float freq){
 	square->phase_step = (uint32_t) (freq * (2147483648.0f / SR));
 	square->freq = freq;
 	square->phase_2 = square->phase_1 + 1073741824;   // make the 2 phases 180 out here
@@ -296,12 +299,12 @@ void bl_square_init(bl_square * square) {
 }
 
 // computes 2 bl saw waves 180 out of phase, and adds them together
-float32_t bl_square_process(bl_square * square){
-	float32_t sig, saw_1, saw_2;
-	float32_t transition_table_index;
+float bl_square_process(bl_square * square){
+	float sig, saw_1, saw_2;
+	float transition_table_index;
 
 	square->phase_1 += square->phase_step;
-	sig = ((((float32_t) square->phase_1 / 2147483648.0f) + 1.f) * .5f) - .5f;
+	sig = ((((float) square->phase_1 / 2147483648.0f) + 1.f) * .5f) - .5f;
 	// scale it,  numerator controls the band limit
 	transition_table_index = sig * (5000.f / square->freq); // 4410 is nyquist * .4
 	// clip it
@@ -313,7 +316,7 @@ float32_t bl_square_process(bl_square * square){
 	saw_1 = bl_step_table_read(transition_table_index) - sig;
 
 	square->phase_2 += square->phase_step;
-	sig = ((((float32_t) square->phase_2 / 2147483648.0f) + 1.f) * .5f) - .5f;
+	sig = ((((float) square->phase_2 / 2147483648.0f) + 1.f) * .5f) - .5f;
 	// scale it
 	transition_table_index = sig * (5000.f / square->freq); // 4410 is nyquist * .4
 	// clip it,  numerator controls the band limit
@@ -398,19 +401,20 @@ float32_t bl_square_process(bl_square * square){
  * @return  sin(x).
  */
 
-float32_t arm_sin_f32(
-  float32_t x)
+float arm_sin_f32(
+  float x)
 {
-  float32_t sinVal, fract, in;                   /* Temporary variables for input, output */
+
+  float sinVal, fract, in;                   /* Temporary variables for input, output */
   int32_t index;                                 /* Index variable */
-  uint32_t tableSize = (uint32_t) TABLE_SIZE;    /* Initialise tablesize */
-  float32_t wa, wb, wc, wd;                      /* Cubic interpolation coefficients */
-  float32_t a, b, c, d;                          /* Four nearest output values */
-  float32_t *tablePtr;                           /* Pointer to table */
+  uint32_t tableSize = (uint32_t) 259;    /* Initialise tablesize */
+  float wa, wb, wc, wd;                      /* Cubic interpolation coefficients */
+  float a, b, c, d;                          /* Four nearest output values */
+  float *tablePtr;                           /* Pointer to table */
   int32_t n;
-  float32_t fractsq, fractby2, fractby6, fractby3, fractsqby2;
-  float32_t oneminusfractby2;
-  float32_t frby2xfrsq, frby6xfrsq;
+  float fractsq, fractby2, fractby6, fractby3, fractsqby2;
+  float oneminusfractby2;
+  float frby2xfrsq, frby6xfrsq;
 
   /* input x is in radians */
   /* Scale the input to [0 1] range from [0 2*PI] , divide input by 2*pi */
@@ -426,13 +430,13 @@ float32_t arm_sin_f32(
   }
 
   /* Map input value to [0 1] */
-  in = in - (float32_t) n;
+  in = in - (float) n;
 
   /* Calculation of index of the table */
   index = (uint32_t) (tableSize * in);
 
   /* fractional value calculation */
-  fract = ((float32_t) tableSize * in) - (float32_t) index;
+  fract = ((float) tableSize * in) - (float) index;
 
   /* Checking min and max index of table */
   if(index < 0)
@@ -445,7 +449,7 @@ float32_t arm_sin_f32(
   }
 
   /* Initialise table pointer */
-  tablePtr = (float32_t *) & sinTable[wavetable_selector][index];
+  tablePtr = (float *) & sinTable[wavetable_selector][index];
 
   /* Read four nearest values of input value from the sin table */
   a = tablePtr[0];

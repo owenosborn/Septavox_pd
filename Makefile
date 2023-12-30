@@ -7,7 +7,8 @@ lib.name = septavox~
 
 # input source file (class name == source file basename)
 class.sources = septavox~.c
-common.sources = pp6.c
+#common.sources = pp6.c
+common.sources = pp6.c audio.c oscillator.c wave_synth.c
 
 # all extra files to be included in binary distribution of the library
 # datafiles = helloworld-help.pd helloworld-meta.pd README.md

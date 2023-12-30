@@ -1,9 +1,11 @@
 #include <stdint.h>
 #include "m_pd.h"  
 #include "pp6.h"
+#include "wave_synth.h"
 
-static t_class *septavox_tilde_class;  
+extern pocket_piano pp6;
 
+static t_class *septavox_tilde_class;
 
 typedef struct _septavox_tilde {  
     t_object  x_obj; 
@@ -33,7 +35,20 @@ void *septavox_tilde_new(void) {
     x->out = outlet_new(&x->x_obj, &s_signal);
 
     pp6_init();
+    wave_synth_init();
     
+    pp6.freqs[0] = 200.f;
+    pp6.freqs[1] = 300.f;
+    pp6.freqs[2] = 400.f;
+    pp6.freqs[3] = 500.f;
+
+	pp6.amps[0] = 1.f;
+	pp6.amps[1] = 1.f;
+	pp6.amps[2] = 1.f;
+	pp6.amps[3] = 1.f;
+
+
+
     return (void *)x;  
 }  
 
@@ -43,7 +58,7 @@ t_int *septavox_tilde_perform(t_int *w) {
     int n = (int)(w[3]);
 
     while (n--) {
-        *out++ = 1.0; // Output 1 for each sample
+        *out++ = wave_synth_process();
     }
     return (w + 4);
 }
@@ -51,7 +66,6 @@ t_int *septavox_tilde_perform(t_int *w) {
 void septavox_tilde_dsp(t_septavox_tilde *x, t_signal **sp) {
     dsp_add(septavox_tilde_perform, 3, x, sp[0]->s_vec, sp[0]->s_n);
 }
-
 
 void septavox_tilde_setup(void) {  
     septavox_tilde_class = class_new(gensym("septavox~"),  
