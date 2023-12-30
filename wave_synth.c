@@ -27,10 +27,10 @@ void wave_synth_init(void){
 
 }
 
-float32_t wave_synth_process(void){
+float wave_synth_process(void){
 
 	uint8_t i;
-	float32_t sig;
+	float sig;
 
 	// just make sure freqs are never 0  cause of divide by 0 issues in the saw and square implementations
 	for (i = 0; i < 4; i++) {

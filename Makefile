@@ -3,10 +3,10 @@
 # settings and rules.
 
 # library name
-lib.name = septavox
+lib.name = septavox~
 
 # input source file (class name == source file basename)
-class.sources = septavox.c
+class.sources = septavox~.c
 common.sources = pp6.c
 
 # all extra files to be included in binary distribution of the library

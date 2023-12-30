@@ -1,1 +1,2 @@
-#N canvas 313 108 450 300 12;
+#N canvas 553 78 450 300 12;
+#X obj 128 114 septavox~, f 18;
