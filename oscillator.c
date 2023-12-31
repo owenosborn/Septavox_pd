@@ -5,16 +5,11 @@
  */
 
 #include <stdint.h>
-#include "pp6.h"
 #include "oscillator.h"
 #include "waves.h"
 
 #define PI 3.14159265359f
 
-
-extern pocket_piano pp6;
-
-float arm_sin_f32(float x);
 
 /*
  * phasor oscillator
@@ -82,7 +77,7 @@ void sin_set(sin_oscillator * oscil, float freq, float amp){
 	oscil->amplitude_target = amp;
 }
 
-float sin_process(sin_oscillator * oscil){
+float sin_process(sin_oscillator * oscil, uint8_t wavetable_selector){
 
 	float phase;
 
@@ -90,11 +85,11 @@ float sin_process(sin_oscillator * oscil){
 	oscil->phase += oscil->phase_step;
 	phase = (((float) oscil->phase / 2147483648.0f) + 1.0f) * PI;
 
-	return arm_sin_f32(phase) * oscil->amplitude;
+	return arm_sin_f32(phase, wavetable_selector) * oscil->amplitude;
 
 }
 
-float sin_process_simple(sin_oscillator * oscil){
+float sin_process_simple(sin_oscillator * oscil, uint8_t wavetable_selector){
 
 	uint32_t phase;
 
@@ -102,10 +97,10 @@ float sin_process_simple(sin_oscillator * oscil){
 
 	phase = ((oscil->phase_accum >> 24) & 0xff) + 1;
 
-	ym1 = sinTable[pp6.wavetable_selector][phase - 1];
-	y = sinTable[pp6.wavetable_selector][phase];
-	yp1 = sinTable[pp6.wavetable_selector][phase + 1];
-	yp2 = sinTable[pp6.wavetable_selector][phase + 2];
+	ym1 = sinTable[wavetable_selector][phase - 1];
+	y = sinTable[wavetable_selector][phase];
+	yp1 = sinTable[wavetable_selector][phase + 1];
+	yp2 = sinTable[wavetable_selector][phase + 2];
 
 
 	frac =  (float) (oscil->phase_accum & 0x00FFFFFF) / 16777216.f;
@@ -198,7 +193,7 @@ float simple_FM(float freq, float harmonicity, float index) {
 	return carrier;
 }
 
-float FM_oscillator_process (FM_oscillator * fm_osc, float freq, float harmonicity, float index) {
+float FM_oscillator_process (FM_oscillator * fm_osc, float freq, float harmonicity, float index, uint8_t wavetable_selector) {
 
 
 	float  y, yp1, frac, modulator, carrier;
@@ -224,8 +219,8 @@ float FM_oscillator_process (FM_oscillator * fm_osc, float freq, float harmonici
 
 	// carrier oscillator
 	fm_osc->carrier_phase = ((fm_osc->carrier_phase_accum >> 24) & 0xff) + 1;
-	y = sinTable[pp6.wavetable_selector][fm_osc->carrier_phase];
-	yp1 = sinTable[pp6.wavetable_selector][fm_osc->carrier_phase + 1];
+	y = sinTable[wavetable_selector][fm_osc->carrier_phase];
+	yp1 = sinTable[wavetable_selector][fm_osc->carrier_phase + 1];
 	frac =  (float) (fm_osc->carrier_phase_accum & 0x00FFFFFF) / 16777216.f;
 	fm_osc->carrier_phase_accum += fm_osc->carrier_phase_step;
 
@@ -401,8 +396,7 @@ float bl_square_process(bl_square * square){
  * @return  sin(x).
  */
 
-float arm_sin_f32(
-  float x)
+float arm_sin_f32(float x, uint8_t wavetable_selector)
 {
 
   float sinVal, fract, in;                   /* Temporary variables for input, output */
@@ -449,7 +443,7 @@ float arm_sin_f32(
   }
 
   /* Initialise table pointer */
-  tablePtr = (float *) & sinTable[pp6.wavetable_selector][index];
+  tablePtr = (float *) & sinTable[wavetable_selector][index];
 
   /* Read four nearest values of input value from the sin table */
   a = tablePtr[0];

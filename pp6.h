@@ -8,6 +8,8 @@
 #ifndef PP6_H_
 #define PP6_H_
 
+#include "oscillator.h"
+
 #define MODE_LED_BLUE_ON 
 #define MODE_LED_RED_ON 
 #define MODE_LED_GREEN_ON
@@ -58,6 +60,11 @@ typedef struct {
 	uint8_t note_state[128];	  // state of all the midi notes -- 0 for off, anything else for on
 	uint8_t note_state_last[128]; // the previos time thru the main loop that notes were updated.  compared with above to get note events
 
+    //oscillators for wave_synth
+    sin_oscillator sins[4];
+    bl_saw saws[4];
+    bl_square squares[4];
+
 	// keys
 	uint8_t keys[43];
 	uint8_t keys_last[43];
@@ -92,104 +99,104 @@ typedef struct {
 
 } pocket_piano;
 
-void pp6_init(void);
+void pp6_init(pocket_piano *pp6);
 
-void pp6_set_global_octave_transpose(uint8_t);
-void pp6_enable_secret_mode(void);
+void pp6_set_global_octave_transpose(pocket_piano *pp6, uint8_t);
+void pp6_enable_secret_mode(pocket_piano *pp6);
 
-float pp6_get_knob_1(void);
-float pp6_get_knob_1_raw(void);
-float pp6_get_knob_2(void);
-float pp6_get_knob_3(void);
-void pp6_set_knob_1(float v);
-void pp6_set_knob_2(float v);
-void pp6_set_knob_3(float v);
-float * pp6_get_knob_array(void);
-void pp6_set_knob_array(float * knobs);
-void pp6_check_knobs_touched (void);
-uint8_t pp6_any_knobs_touched(void);
-uint8_t pp6_knob_1_touched(void);
-uint8_t pp6_knob_2_touched(void);
-uint8_t pp6_knob_3_touched(void);
+float pp6_get_knob_1(pocket_piano *pp6);
+float pp6_get_knob_1_raw(pocket_piano *pp6);
+float pp6_get_knob_2(pocket_piano *pp6);
+float pp6_get_knob_3(pocket_piano *pp6);
+void pp6_set_knob_1(pocket_piano *pp6,float v);
+void pp6_set_knob_2(pocket_piano *pp6,float v);
+void pp6_set_knob_3(pocket_piano *pp6,float v);
+float * pp6_get_knob_array(pocket_piano *pp6);
+void pp6_set_knob_array(pocket_piano *pp6,float * knobs);
+void pp6_check_knobs_touched (pocket_piano *pp6);
+uint8_t pp6_any_knobs_touched(pocket_piano *pp6);
+uint8_t pp6_knob_1_touched(pocket_piano *pp6);
+uint8_t pp6_knob_2_touched(pocket_piano *pp6);
+uint8_t pp6_knob_3_touched(pocket_piano *pp6);
 
-uint8_t pp6_get_synth_note_start(void);
-void pp6_set_synth_note_start (void );
-uint8_t pp6_get_synth_note_stop(void);
-void pp6_set_synth_note_stop (void );
-uint8_t pp6_get_synth_note(void);
-void pp6_set_synth_note(uint8_t note);
-
-
-void pp6_clear_flags(void);
-
-uint8_t pp6_is_playing (void);
-
-uint32_t pp6_get_keys(void);   // returns the current key status
-uint8_t pp6_get_num_keys_down(void);
-void pp6_get_key_events(void);  // checks keys for new events
-void pp6_allocate_voices(void);
-
-void pp6_change_mode(void);
-uint32_t pp6_get_mode(void);
-void pp6_set_mode(uint32_t mode);
-
-void pp6_keys_init(void);
-void pp6_keys_update(void);   // scans and debounces keys
-void pp6_leds_init(void);
-void pp6_leds_update(uint8_t bank_led, uint8_t mode_led);
-void pp6_knobs_init(void);
-void pp6_knobs_update(void);
-void pp6_smooth_knobs(void);
+uint8_t pp6_get_synth_note_start(pocket_piano *pp6);
+void pp6_set_synth_note_start (pocket_piano *pp6);
+uint8_t pp6_get_synth_note_stop(pocket_piano *pp6);
+void pp6_set_synth_note_stop (pocket_piano *pp6);
+uint8_t pp6_get_synth_note(pocket_piano *pp6);
+void pp6_set_synth_note(pocket_piano *pp6,uint8_t note);
 
 
+void pp6_clear_flags(pocket_piano *pp6);
 
-uint8_t pp6_get_mode_led(void);
-uint8_t pp6_get_aux_led(void);
-void pp6_set_mode_led(uint8_t mode_led);
-void pp6_set_aux_led(uint8_t bank_led);
+uint8_t pp6_is_playing (pocket_piano *pp6);
 
-void pp6_flash_mode_led(uint8_t flash_time);
-void pp6_flash_aux_led(uint8_t flash_time);
-void pp6_flash_update(void);
+uint32_t pp6_get_keys(pocket_piano *pp6);   // returns the current key status
+uint8_t pp6_get_num_keys_down(pocket_piano *pp6);
+void pp6_get_key_events(pocket_piano *pp6);  // checks keys for new events
+void pp6_allocate_voices(pocket_piano *pp6);
 
-void  pp6_set_mode_button_pressed(void);
-void pp6_set_mode_button_released(void);
-uint8_t pp6_mode_button_pressed(void);
-uint8_t pp6_mode_button_released(void);
+void pp6_change_mode(pocket_piano *pp6);
+uint32_t pp6_get_mode(pocket_piano *pp6);
+void pp6_set_mode(pocket_piano *pp6,uint32_t mode);
 
-void  pp6_set_aux_button_pressed(void);
-void pp6_set_aux_button_released(void);
-uint8_t pp6_aux_button_pressed(void);
-uint8_t pp6_aux_button_released(void);
+void pp6_keys_init(pocket_piano *pp6);
+void pp6_keys_update(pocket_piano *pp6);   // scans and debounces keys
+void pp6_leds_init(pocket_piano *pp6);
+void pp6_leds_update(pocket_piano *pp6,uint8_t bank_led, uint8_t mode_led);
+void pp6_knobs_init(pocket_piano *pp6);
+void pp6_knobs_update(pocket_piano *pp6);
+void pp6_smooth_knobs(pocket_piano *pp6);
 
-void pp6_inc_physical_notes_on(void);
-void pp6_dec_physical_notes_on(void);
-uint8_t pp6_get_physical_notes_on(void);
+
+
+uint8_t pp6_get_mode_led(pocket_piano *pp6);
+uint8_t pp6_get_aux_led(pocket_piano *pp6);
+void pp6_set_mode_led(pocket_piano *pp6,uint8_t mode_led);
+void pp6_set_aux_led(pocket_piano *pp6,uint8_t bank_led);
+
+void pp6_flash_mode_led(pocket_piano *pp6,uint8_t flash_time);
+void pp6_flash_aux_led(pocket_piano *pp6,uint8_t flash_time);
+void pp6_flash_update(pocket_piano *pp6);
+
+void  pp6_set_mode_button_pressed(pocket_piano *pp6);
+void pp6_set_mode_button_released(pocket_piano *pp6);
+uint8_t pp6_mode_button_pressed(pocket_piano *pp6);
+uint8_t pp6_mode_button_released(pocket_piano *pp6);
+
+void  pp6_set_aux_button_pressed(pocket_piano *pp6);
+void pp6_set_aux_button_released(pocket_piano *pp6);
+uint8_t pp6_aux_button_pressed(pocket_piano *pp6);
+uint8_t pp6_aux_button_released(pocket_piano *pp6);
+
+void pp6_inc_physical_notes_on(pocket_piano *pp6);
+void pp6_dec_physical_notes_on(pocket_piano *pp6);
+uint8_t pp6_get_physical_notes_on(pocket_piano *pp6);
 
 // midi start stop events
-void pp6_set_midi_start(void);
-uint8_t pp6_get_midi_start(void);
-void pp6_set_midi_stop(void);
-uint8_t pp6_get_midi_stop(void);
+void pp6_set_midi_start(pocket_piano *pp6);
+uint8_t pp6_get_midi_start(pocket_piano *pp6);
+void pp6_set_midi_stop(pocket_piano *pp6);
+uint8_t pp6_get_midi_stop(pocket_piano *pp6);
 
 /// MIDI clock stuff
-void pp6_midi_clock_tick(void);
-void pp6_check_for_midi_clock(void) ;
-uint8_t pp6_midi_clock_present(void);
-uint32_t pp6_get_midi_clock_period(void);
-uint8_t pp6_get_midi_clock_tick(void);
-void pp6_clear_midi_clock_tick(void);
-uint8_t pp6_get_midi_clock_count(void) ;
+void pp6_midi_clock_tick(pocket_piano *pp6);
+void pp6_check_for_midi_clock(pocket_piano *pp6) ;
+uint8_t pp6_midi_clock_present(pocket_piano *pp6);
+uint32_t pp6_get_midi_clock_period(pocket_piano *pp6);
+uint8_t pp6_get_midi_clock_tick(pocket_piano *pp6);
+void pp6_clear_midi_clock_tick(pocket_piano *pp6);
+uint8_t pp6_get_midi_clock_count(pocket_piano *pp6) ;
 
 // the note interface for the piano
-uint8_t pp6_note_on_flag();
-uint8_t pp6_note_off_flag();
-void pp6_set_note_off(uint8_t note);
-void pp6_set_note_on(uint8_t note);
-uint8_t pp6_get_note_state(uint8_t note);
-uint8_t pp6_get_note_state_last(uint8_t);
-void pp6_set_current_note_state_to_last(void);
-void pp6_turn_off_all_on_notes(void);
+uint8_t pp6_note_on_flag(pocket_piano *pp6);
+uint8_t pp6_note_off_flag(pocket_piano *pp6);
+void pp6_set_note_off(pocket_piano *pp6,uint8_t note);
+void pp6_set_note_on(pocket_piano *pp6,uint8_t note);
+uint8_t pp6_get_note_state(pocket_piano *pp6,uint8_t note);
+uint8_t pp6_get_note_state_last(pocket_piano *pp6,uint8_t);
+void pp6_set_current_note_state_to_last(pocket_piano *pp6);
+void pp6_turn_off_all_on_notes(pocket_piano *pp6);
 
 
 #endif /* PP6_H_ */

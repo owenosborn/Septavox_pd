@@ -3,7 +3,6 @@
 #include "pp6.h"
 #include "wave_synth.h"
 
-extern pocket_piano pp6;
 
 static t_class *septavox_tilde_class;
 
@@ -13,42 +12,41 @@ typedef struct _septavox_tilde {
     t_int i_note_num;
     t_int i_note_vel;
     t_outlet *out; 
+    pocket_piano pp6;
 } t_septavox_tilde;  
 
 void septavox_tilde_bang(t_septavox_tilde *x) {
 }
 
 void septavox_tilde_notein(t_septavox_tilde *x, t_floatarg num) {  
-    x->i_note_num = (t_int)num;
-    pp6.aux_button_count = (uint8_t)num;
-    post("asdf");
 }  
 
-void septavox_tilde_velin(t_septavox_tilde *x, t_floatarg vel) {  
-    x->i_note_vel = (t_int)vel;
+void septavox_tilde_waveform(t_septavox_tilde *x, t_floatarg num) {  
+    x->pp6.aux_button_count = (uint8_t)num;
+    post("my waveform: %d", x->pp6.aux_button_count);
 }
 
 void *septavox_tilde_new(void) {  
     t_septavox_tilde *x = (t_septavox_tilde *)pd_new(septavox_tilde_class);  
     
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("notein"));
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("velin"));
+    //inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("notein"));
+    //inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("waveform"));
 
     x->out = outlet_new(&x->x_obj, &s_signal);
 
-    pp6_init();
-    wave_synth_init();
+    pp6_init(&(x->pp6));
+    wave_synth_init(&(x->pp6));
     
-    pp6.freqs[0] = 440.f;
-    pp6.freqs[1] = 1.f;
-    pp6.freqs[2] = 1.f;
-    pp6.freqs[3] = 1.f;
+    x->pp6.freqs[0] = 440.f;
+    x->pp6.freqs[1] = 1.f;
+    x->pp6.freqs[2] = 1.f;
+    x->pp6.freqs[3] = 1.f;
 
-	pp6.amps[0] = 1.f;
-	pp6.amps[1] = 0.f;
-	pp6.amps[2] = 0.f;
-	pp6.amps[3] = 0.f;
-    pp6.aux_button_count = 0;
+	x->pp6.amps[0] = 1.f;
+	x->pp6.amps[1] = 0.f;
+	x->pp6.amps[2] = 0.f;
+	x->pp6.amps[3] = 0.f;
+    x->pp6.aux_button_count = 0;
 
 
     return (void *)x;  
@@ -60,7 +58,7 @@ t_int *septavox_tilde_perform(t_int *w) {
     int n = (int)(w[3]);
 
     while (n--) {
-        *out++ = wave_synth_process();
+        *out++ = wave_synth_process(&(x->pp6));
     }
     return (w + 4);
 }
@@ -79,7 +77,7 @@ void septavox_tilde_setup(void) {
         (t_method)septavox_tilde_notein, gensym("notein"),  
         A_DEFFLOAT, 0);  
     class_addmethod(septavox_tilde_class,  
-        (t_method)septavox_tilde_velin, gensym("velin"),  
+        (t_method)septavox_tilde_waveform, gensym("waveform"),  
         A_DEFFLOAT, 0);  
 
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_dsp, gensym("dsp"), A_CANT, 0);

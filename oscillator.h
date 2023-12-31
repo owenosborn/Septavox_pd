@@ -78,14 +78,15 @@ float squarewave_process(square_oscillator * square);
 void sin_init(sin_oscillator * oscil);
 void sin_set(sin_oscillator * oscil, float freq, float amp);
 void sin_reset(sin_oscillator * oscil);
-float sin_process(sin_oscillator * oscil);
-float sin_process_simple(sin_oscillator * oscil);
+float sin_process(sin_oscillator * oscil, uint8_t wavetable_selector);
+float sin_process_simple(sin_oscillator * oscil, uint8_t wavetable_selector);
+float arm_sin_f32(float x, uint8_t wavetable_selector);
 
 
 /////////////////
 float simple_sin(float f);
 float simple_FM(float freq, float harmonicity, float index);
-float FM_oscillator_process (FM_oscillator * fm_osc, float freq, float harmonicity, float index);
+float FM_oscillator_process (FM_oscillator * fm_osc, float freq, float harmonicity, float index, uint8_t wavetable_selector);
 
 
 
