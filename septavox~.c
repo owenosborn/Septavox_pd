@@ -19,6 +19,7 @@ void septavox_tilde_bang(t_septavox_tilde *x) {
 }
 
 void septavox_tilde_notein(t_septavox_tilde *x, t_floatarg num) {  
+    x->pp6.freqs[0] = num;
 }  
 
 void septavox_tilde_waveform(t_septavox_tilde *x, t_floatarg num) {  

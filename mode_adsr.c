@@ -14,9 +14,9 @@
 
 
 
-extern pocket_piano pp6;
+//extern pocket_piano pp6;
 
-static sadsr amp_env[4];
+//static sadsr amp_env[4];
 
 
 
