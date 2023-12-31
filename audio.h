@@ -17,11 +17,7 @@
 //#define BASE_FREQ 220.f   // A
 
 
-//#define SR 22374.0f
-#define NYQUIST 5000.0f
-#define SR 11200.0f
-//#define KR 1378.125f // sr / 16
-#define KR 11200.0f // sr / 16
+#define SR 24000.0f
 #define TWO_PI 6.283185307f
 
 float c_to_f(float c);

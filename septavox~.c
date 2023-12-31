@@ -20,6 +20,8 @@ void septavox_tilde_bang(t_septavox_tilde *x) {
 
 void septavox_tilde_notein(t_septavox_tilde *x, t_floatarg num) {  
     x->i_note_num = (t_int)num;
+    pp6.aux_button_count = (uint8_t)num;
+    post("asdf");
 }  
 
 void septavox_tilde_velin(t_septavox_tilde *x, t_floatarg vel) {  
@@ -37,16 +39,16 @@ void *septavox_tilde_new(void) {
     pp6_init();
     wave_synth_init();
     
-    pp6.freqs[0] = 200.f;
-    pp6.freqs[1] = 300.f;
-    pp6.freqs[2] = 400.f;
-    pp6.freqs[3] = 500.f;
+    pp6.freqs[0] = 440.f;
+    pp6.freqs[1] = 1.f;
+    pp6.freqs[2] = 1.f;
+    pp6.freqs[3] = 1.f;
 
 	pp6.amps[0] = 1.f;
-	pp6.amps[1] = 1.f;
-	pp6.amps[2] = 1.f;
-	pp6.amps[3] = 1.f;
-
+	pp6.amps[1] = 0.f;
+	pp6.amps[2] = 0.f;
+	pp6.amps[3] = 0.f;
+    pp6.aux_button_count = 0;
 
 
     return (void *)x;  

@@ -13,11 +13,9 @@
 #include "wave_synth.h"
 
 extern pocket_piano pp6;
-extern uint8_t wavetable_selector;
 static sin_oscillator sins[4];
 static bl_saw saws[4];
 static bl_square squares[4];
-
 
 void wave_synth_init(void){
 	uint8_t i;
@@ -41,7 +39,7 @@ float wave_synth_process(void){
 	}
 
 	if (pp6.aux_button_count == 0){
-		wavetable_selector = 1;
+		pp6.wavetable_selector = 1;
 		sig = 0;
 		for (i = 0; i < 4; i++) {
 			sin_set(&sins[i], pp6.freqs[i] * (pp6_get_knob_1() + 1), .1f);
@@ -50,7 +48,7 @@ float wave_synth_process(void){
 		sig *= 1;
 	}
 	if (pp6.aux_button_count == 1){
-		wavetable_selector = 0;
+		pp6.wavetable_selector = 0;
 		sig = 0;
 		for (i = 0; i < 4; i++) {
 			sin_set(&sins[i], pp6.freqs[i] * (pp6_get_knob_1() + 1), .1f);
@@ -59,7 +57,7 @@ float wave_synth_process(void){
 		sig *= 1;
 	}
 	if (pp6.aux_button_count == 2){
-		wavetable_selector = 2;
+		pp6.wavetable_selector = 2;
 		sig = 0;
 		for (i = 0; i < 4; i++) {
 			sin_set(&sins[i], pp6.freqs[i] * (pp6_get_knob_1() + 1), .1f);
@@ -87,7 +85,7 @@ float wave_synth_process(void){
 
 
 	if (pp6.aux_button_count == 5){
-		wavetable_selector = 3;
+		pp6.wavetable_selector = 3;
 		sig = 0;
 		for (i = 0; i < 4; i++) {
 			sin_set(&sins[i], pp6.freqs[i] * (pp6_get_knob_1() + 1), .1f);
@@ -96,7 +94,7 @@ float wave_synth_process(void){
 		sig *= 1;
 	}
 	if (pp6.aux_button_count == 6){
-		wavetable_selector = 4;
+		pp6.wavetable_selector = 4;
 		sig = 0;
 		for (i = 0; i < 4; i++) {
 			sin_set(&sins[i], pp6.freqs[i] * (pp6_get_knob_1() + 1), .1f);

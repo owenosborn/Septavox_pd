@@ -12,10 +12,8 @@
 #include "pp6.h"
 #include "audio.h"
 #include "mode_mega_wave.h"
-#include "oscillator.h"
 #include "line.h"
 
-extern uint8_t wavetable_selector;
 
 extern pocket_piano pp6;
 
@@ -61,13 +59,13 @@ float32_t mode_mega_wave_sample_process (void) {
 
 	}
 
-	if (pp6.aux_button_count == 0) wavetable_selector = 0;
-	if (pp6.aux_button_count == 1) wavetable_selector = 1;
-	if (pp6.aux_button_count == 2) wavetable_selector = 2;
-	if (pp6.aux_button_count == 3) wavetable_selector = 3;
-	if (pp6.aux_button_count == 4) wavetable_selector = 4;
-	if (pp6.aux_button_count == 5) wavetable_selector = 5;
-	if (pp6.aux_button_count == 6) wavetable_selector = 6;
+	if (pp6.aux_button_count == 0) pp6.wavetable_selector = 0;
+	if (pp6.aux_button_count == 1) pp6.wavetable_selector = 1;
+	if (pp6.aux_button_count == 2) pp6.wavetable_selector = 2;
+	if (pp6.aux_button_count == 3) pp6.wavetable_selector = 3;
+	if (pp6.aux_button_count == 4) pp6.wavetable_selector = 4;
+	if (pp6.aux_button_count == 5) pp6.wavetable_selector = 5;
+	if (pp6.aux_button_count == 6) pp6.wavetable_selector = 6;
 
 
 	knob1 = pp6_get_knob_1() + 1;
@@ -102,10 +100,8 @@ void mode_mega_wave_control_process (void) {
 				line_go(&aramps[i], 1, 5);
 			}
 			else {
-
-
-
-				freqs[i][0] = 0.1f;
+				
+                freqs[i][0] = 0.1f;
 				freqs[i][1] = 0.1f;
 				freqs[i][2] = 0.1f;
 				freqs[i][3] = 0.1f;

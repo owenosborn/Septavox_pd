@@ -48,6 +48,7 @@ typedef struct {
 	// wave synth.  freqs and amps that are shared between all modes
 	float freqs[4];
 	float amps[4];
+    uint8_t wavetable_selector;
 
 	// voices the synth is playing
 	uint8_t voices[4];

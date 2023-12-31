@@ -71,12 +71,13 @@ void pp6_init(void) {
 	pp6.freqs[1] = 101;
 	pp6.freqs[2] = 102;
 	pp6.freqs[3] = 103;
-
+    
 	pp6.amps[0] = 0;
 	pp6.amps[1] = 0;
 	pp6.amps[2] = 0;
 	pp6.amps[3] = 0;
 
+    pp6.wavetable_selector = 0;
 
 	// init the note on arrays
 	for (i = 0; i < 128; i++) {
