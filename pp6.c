@@ -32,6 +32,10 @@ void pp6_init(pocket_piano *pp6) {
 
 	pp6->secret_mode_enabled = 0;
 
+    pp6->knob[0] = .5f;
+    pp6->knob[1] = .5f;
+    pp6->knob[2] = .5f;
+
 	pp6->knob_touched[0] = 0;
 	pp6->knob_touched[1] = 0;
 	pp6->knob_touched[2] = 0;
@@ -55,6 +59,11 @@ void pp6_init(pocket_piano *pp6) {
 	pp6->voices[1] = 0;
 	pp6->voices[2] = 0;
 	pp6->voices[3] = 0;
+
+	pp6->voices_last[0] = 0;
+	pp6->voices_last[1] = 0;
+	pp6->voices_last[2] = 0;
+	pp6->voices_last[3] = 0;
 
 	pp6->voices_note_on_flag[0] = 0;
 	pp6->voices_note_on_flag[1] = 0;

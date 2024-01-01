@@ -16,7 +16,7 @@ void sadsr_init(sadsr * sadsr){
 	sadsr->zero_flag = 0;
 }
 
-float32_t sadsr_process(sadsr * sadsr){
+float sadsr_process(sadsr * sadsr){
 
 	// 3 segments: 0, 1, 2.  3 is envelope stopped
 	if (sadsr->segment == 0){
@@ -54,7 +54,7 @@ float32_t sadsr_process(sadsr * sadsr){
 	return sadsr->val;
 }
 
-void sadsr_set(sadsr * sadsr, float32_t a, float32_t d, float32_t r, float32_t sus_level){
+void sadsr_set(sadsr * sadsr, float a, float d, float r, float sus_level){
 	sadsr->sustain_level = sus_level ;
 	sadsr->attack_delta = (1.f / a) / SR;
 	sadsr->decay_delta = (1.f / d) / SR;

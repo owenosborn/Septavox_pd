@@ -5,6 +5,7 @@
  */
 
 #include <stdint.h>
+#include "audio.h"
 #include "oscillator.h"
 #include "waves.h"
 

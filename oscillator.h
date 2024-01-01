@@ -8,7 +8,6 @@
 #ifndef OSCILLATOR_H_
 #define OSCILLATOR_H_
 
-#include "audio.h"
 
 typedef struct {
 	float freq;

@@ -21,8 +21,6 @@
 #include "wave_synth.h"
 #include "mode_octave_arp.h"
 
-extern pocket_piano pp6;
-
 static sad amp_env[4];
 static bl_saw saws[4];
 static bl_square squares[4];
@@ -46,7 +44,7 @@ float32_t mode_octave_arp_sample_process (void) {
 	// process envelopes
 	for (i = 0; i < 4; i++) {
 		pp6.amps[i] = sad_process(&amp_env[i]);
-		pp6.amps[i] = pp6.amps[i] * pp6.amps[i];   // square it for fake log
+		pp6.amps[i] = pp6.amps[i] * pp6.amps[i];  
 	}
 
 	return wave_synth_process();
@@ -55,16 +53,6 @@ float32_t mode_octave_arp_sample_process (void) {
 void mode_octave_arp_control_process (void) {
 
 	   uint8_t i = 0;
-	    static uint8_t l = 0;
-	    static uint8_t octave_shift = 0;
-
-	    //envelopes
-		for (i=0;i<4;i++){
-			//sad_set(&amp_env[i], .01f, (pp6_get_knob_2() * 2.f) + .01f);
-		}
-
-		//click along ,  do it from midi clock , or manual
-		static uint8_t midi_clk_last = 0;
 		uint8_t midi_clk = pp6_get_midi_clock_count();
 
 		if (pp6_midi_clock_present()){

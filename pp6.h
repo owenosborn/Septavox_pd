@@ -9,6 +9,8 @@
 #define PP6_H_
 
 #include "oscillator.h"
+#include "wave_synth.h"
+#include "sadsr.h"
 
 #define MODE_LED_BLUE_ON 
 #define MODE_LED_RED_ON 
@@ -47,23 +49,20 @@ typedef struct {
 	// secret mode
 	uint8_t secret_mode_enabled;
 
-	// wave synth.  freqs and amps that are shared between all modes
-	float freqs[4];
-	float amps[4];
-    uint8_t wavetable_selector;
+	// freqs and amps that are shared between all modes
 
-	// voices the synth is playing
+    // voices the synth is playing
 	uint8_t voices[4];
+	uint8_t voices_last[4];
 	uint8_t voices_note_on_flag[4];  // 4 flags for new notes
 
 	uint8_t physical_notes_on;    // the number of non sequenced notes currently on
 	uint8_t note_state[128];	  // state of all the midi notes -- 0 for off, anything else for on
 	uint8_t note_state_last[128]; // the previos time thru the main loop that notes were updated.  compared with above to get note events
 
-    //oscillators for wave_synth
-    sin_oscillator sins[4];
-    bl_saw saws[4];
-    bl_square squares[4];
+    // data for other stuff
+    wave_synth wave_synth;
+    sadsr mode_adsr_amp_env[4];
 
 	// keys
 	uint8_t keys[43];

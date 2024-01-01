@@ -9,13 +9,10 @@
 #define MODE_ADSR_H_
 
 
-#include "arm_math.h"
 
-void mode_adsr_init (void);
+void mode_adsr_init (pocket_piano *pp6);
 
-float32_t mode_adsr_sample_process (void);
-
-void mode_adsr_control_process (void);
+float mode_adsr_sample_process(pocket_piano *pp6);
 
 
 #endif /* MODE_ADSR_H_ */

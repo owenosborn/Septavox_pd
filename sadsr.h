@@ -8,26 +8,25 @@
 #ifndef SADSR_H_
 #define SADSR_H_
 
-
-#include "arm_math.h"
+#include <stdint.h>
 #include "audio.h"
 
 typedef struct {
-	float32_t val;
-	float32_t attack_delta;
-	float32_t decay_delta;
-	float32_t release_delta;
-	float32_t sustain_level;
-	float32_t stop_delta;
+	float val;
+	float attack_delta;
+	float decay_delta;
+	float release_delta;
+	float sustain_level;
+	float stop_delta;
 	uint8_t segment;
 	uint8_t zero_flag;
 } sadsr;
 
 void sadsr_init(sadsr * sadsr);
 
-float32_t sadsr_process(sadsr * sadsr);
+float sadsr_process(sadsr * sadsr);
 
-void sadsr_set(sadsr * sadsr, float32_t a, float32_t d, float32_t r, float32_t sus_level);
+void sadsr_set(sadsr * sadsr, float a, float d, float r, float sus_level);
 
 void sadsr_go(sadsr * sadsr);
 void sadsr_release(sadsr * sadsr);
