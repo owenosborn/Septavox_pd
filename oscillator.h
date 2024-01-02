@@ -8,6 +8,7 @@
 #ifndef OSCILLATOR_H_
 #define OSCILLATOR_H_
 
+#include <stdint.h>
 
 typedef struct {
 	float freq;

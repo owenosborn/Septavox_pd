@@ -9,7 +9,6 @@
 #define PP6_H_
 
 #include "oscillator.h"
-#include "wave_synth.h"
 #include "sadsr.h"
 
 #define MODE_LED_BLUE_ON 
@@ -60,10 +59,6 @@ typedef struct {
 	uint8_t note_state[128];	  // state of all the midi notes -- 0 for off, anything else for on
 	uint8_t note_state_last[128]; // the previos time thru the main loop that notes were updated.  compared with above to get note events
 
-    // data for other stuff
-    wave_synth wave_synth;
-    sadsr mode_adsr_amp_env[4];
-
 	// keys
 	uint8_t keys[43];
 	uint8_t keys_last[43];
@@ -95,6 +90,16 @@ typedef struct {
 	uint32_t midi_clock_period;  // time in between midi clock ticks
 	uint8_t midi_clock_tick_count;
 	uint8_t midi_clock_flag;
+
+
+    // septavox data
+    sin_oscillator wave_synth_sins[4];
+    bl_saw wave_synth_saws[4];
+    bl_square wave_synth_squares[4];
+    sadsr mode_adsr_amp_env[4];
+	float freqs[4];
+	float amps[4];
+    uint8_t wavetable_selector;
 
 } pocket_piano;
 
@@ -147,8 +152,6 @@ void pp6_knobs_init(pocket_piano *pp6);
 void pp6_knobs_update(pocket_piano *pp6);
 void pp6_smooth_knobs(pocket_piano *pp6);
 
-
-
 uint8_t pp6_get_mode_led(pocket_piano *pp6);
 uint8_t pp6_get_aux_led(pocket_piano *pp6);
 void pp6_set_mode_led(pocket_piano *pp6,uint8_t mode_led);
@@ -196,6 +199,5 @@ uint8_t pp6_get_note_state(pocket_piano *pp6,uint8_t note);
 uint8_t pp6_get_note_state_last(pocket_piano *pp6,uint8_t);
 void pp6_set_current_note_state_to_last(pocket_piano *pp6);
 void pp6_turn_off_all_on_notes(pocket_piano *pp6);
-
 
 #endif /* PP6_H_ */
