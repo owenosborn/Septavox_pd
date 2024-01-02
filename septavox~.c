@@ -5,6 +5,7 @@
 #include "pp6.h"
 #include "wave_synth.h"
 #include "mode_adsr.h"
+#include "mode_octave_arp.h"
 
 static t_class *septavox_tilde_class;
 
@@ -36,7 +37,6 @@ void septavox_tilde_notein(t_septavox_tilde *x, t_floatarg num, t_floatarg vel) 
 
 void septavox_tilde_waveform(t_septavox_tilde *x, t_floatarg num) {  
     x->pp6.aux_button_count = (uint8_t)num;
-  //  post("my waveform: %d", x->pp6.wavetable_selector);
 }
 
 void septavox_tilde_knob1(t_septavox_tilde *x, t_floatarg k) {  
@@ -62,6 +62,7 @@ void *septavox_tilde_new(void) {
     pp6_init(&(x->pp6));
     wave_synth_init(&(x->pp6));
     mode_adsr_init(&(x->pp6));
+    mode_octave_arp_init(&(x->pp6));
 
     return (void *)x;  
 }  
@@ -72,7 +73,8 @@ t_int *septavox_tilde_perform(t_int *w) {
     int n = (int)(w[3]);
 
     while (n--) {
-        *out++ = mode_adsr_sample_process(&(x->pp6));
+        //*out++ = mode_adsr_sample_process(&(x->pp6));
+        *out++ = mode_octave_arp_sample_process(&(x->pp6));
     }
     return (w + 4);
 }

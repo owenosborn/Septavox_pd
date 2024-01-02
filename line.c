@@ -4,28 +4,28 @@
  *  Created on: Apr 18, 2012
  *      Author: owen
  */
-
+#include <stdint.h>
 #include "line.h"
 
-void line_set(line * l, float32_t v){
+void line_set(line * l, float v){
 	l->value = v;
 }
 
-void line_go(line * line, float32_t v, float32_t t){
+void line_go(line * line, float v, float t){
 
 	line->target = v;
 
 	line->num_steps = (t / 1000.f) * KR;
 
 	// ammount i'm stepping
-	line->step_slope = (line->target - line->value) / (float32_t)line->num_steps;
+	line->step_slope = (line->target - line->value) / (float)line->num_steps;
 
 	// reset the step countdown
 	line->steps_remain = line->num_steps;
 
 }
 
-float32_t line_process(line * line){
+float line_process(line * line){
 
 	if (line->steps_remain) {
 		line->value += line->step_slope;

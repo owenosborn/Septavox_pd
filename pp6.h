@@ -10,6 +10,7 @@
 
 #include "oscillator.h"
 #include "sadsr.h"
+#include "sad.h"
 
 #define MODE_LED_BLUE_ON 
 #define MODE_LED_RED_ON 
@@ -96,10 +97,18 @@ typedef struct {
     sin_oscillator wave_synth_sins[4];
     bl_saw wave_synth_saws[4];
     bl_square wave_synth_squares[4];
-    sadsr mode_adsr_amp_env[4];
 	float freqs[4];
 	float amps[4];
     uint8_t wavetable_selector;
+
+    sadsr mode_adsr_amp_env[4];
+
+    sad mode_octave_arp_amp_env[4];
+    uint32_t mode_octave_arp_click;
+    uint32_t mode_octave_arp_click_count;
+    uint8_t mode_octave_arp_l;
+    uint8_t mode_octave_arp_octave_shift;
+    uint8_t mode_octave_arp_midi_clk_last;
 
 } pocket_piano;
 

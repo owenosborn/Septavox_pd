@@ -5,6 +5,7 @@
  *      Author: owen
  */
 
+#include <stdint.h>
 #include "sad.h"
 
 void sad_init(sad * sad){
@@ -14,7 +15,7 @@ void sad_init(sad * sad){
 	sad->decay_delta = .01f;
 }
 
-float32_t sad_process(sad * sad){
+float sad_process(sad * sad){
 
 	// 3 segments: 0, 1, 2.  3 is envelope stopped
 	if (sad->segment == 0){
@@ -42,7 +43,7 @@ float32_t sad_process(sad * sad){
 	return sad->val;
 }
 
-void sad_set(sad * sad, float32_t a, float32_t d){
+void sad_set(sad * sad, float a, float d){
 
 	sad->attack_time = a;
 	sad->decay_time = d;

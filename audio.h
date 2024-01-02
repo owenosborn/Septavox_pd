@@ -18,6 +18,7 @@
 
 
 #define SR 24000.0f
+#define KR 10000.0f
 #define TWO_PI 6.283185307f
 
 float c_to_f(float c);
