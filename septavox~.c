@@ -6,6 +6,8 @@
 #include "wave_synth.h"
 #include "mode_adsr.h"
 #include "mode_octave_arp.h"
+#include "mode_simple_poly.h"
+#include "mode_mega_wave.h"
 
 static t_class *septavox_tilde_class;
 
@@ -35,6 +37,10 @@ void septavox_tilde_notein(t_septavox_tilde *x, t_floatarg num, t_floatarg vel) 
     pp6_allocate_voices(&(x->pp6));
 }  
 
+void septavox_tilde_freq0(t_septavox_tilde *x, t_floatarg freq) {  
+//    x->pp6.freqs[0] = freq;
+}
+
 void septavox_tilde_waveform(t_septavox_tilde *x, t_floatarg num) {  
     x->pp6.aux_button_count = (uint8_t)num;
 }
@@ -63,7 +69,9 @@ void *septavox_tilde_new(void) {
     wave_synth_init(&(x->pp6));
     mode_adsr_init(&(x->pp6));
     mode_octave_arp_init(&(x->pp6));
-
+    mode_simple_poly_init(&(x->pp6));
+    mode_mega_wave_init(&(x->pp6));
+    
     return (void *)x;  
 }  
 
@@ -73,8 +81,12 @@ t_int *septavox_tilde_perform(t_int *w) {
     int n = (int)(w[3]);
 
     while (n--) {
+
+        //*out++ = wave_synth_process(&(x->pp6));
         //*out++ = mode_adsr_sample_process(&(x->pp6));
-        *out++ = mode_octave_arp_sample_process(&(x->pp6));
+        //*out++ = mode_octave_arp_sample_process(&(x->pp6));
+        //*out++ = mode_simple_poly_sample_process(&(x->pp6));
+        *out++ = mode_mega_wave_sample_process(&(x->pp6));
     }
     return (w + 4);
 }
@@ -94,6 +106,7 @@ void septavox_tilde_setup(void) {
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_knob1, gensym("knob1"), A_DEFFLOAT, 0);  
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_knob2, gensym("knob2"), A_DEFFLOAT, 0);  
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_knob3, gensym("knob3"), A_DEFFLOAT, 0);  
+    class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_freq0, gensym("freq0"), A_DEFFLOAT, 0);  
 
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_dsp, gensym("dsp"), A_CANT, 0);
 }

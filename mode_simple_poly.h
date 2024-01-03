@@ -8,12 +8,11 @@
 #ifndef MODE_SIMPLE_POLY_H_
 #define MODE_SIMPLE_POLY_H_
 
-#include "arm_math.h"
+#include "pp6.h"
 
-void mode_simple_poly_init (void);
+void mode_simple_poly_init (pocket_piano *pp6);
 
-float32_t mode_simple_poly_sample_process (void);
+float mode_simple_poly_sample_process (pocket_piano *pp6);
 
-void mode_simple_poly_control_process (void);
 
 #endif /* MODE_SIMPLE_POLY_H_ */

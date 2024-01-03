@@ -18,7 +18,6 @@ void wave_synth_init(pocket_piano *pp6){
 		bl_saw_reset(&(pp6->wave_synth_saws[i]));
 		bl_square_init(&(pp6->wave_synth_squares[i]));
 	}
-
 }
 
 float wave_synth_process(pocket_piano *pp6){
