@@ -8,15 +8,10 @@
 #ifndef MODE_OCTAVE_CASCADE_H_
 #define MODE_OCTAVE_CASCADE_H_
 
-#include "arm_math.h"
+#include "pp6.h"
 
-void mode_octave_cascade_init(void);
+void mode_octave_cascade_init(pocket_piano *pp6);
 
-float32_t mode_octave_cascade_sample_process (void) ;
-
-void mode_octave_cascade_control_process (void);
-
-
-
+float mode_octave_cascade_sample_process (pocket_piano *pp6);
 
 #endif /* MODE_OCTAVE_CASCADE_H_ */

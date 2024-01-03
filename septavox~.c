@@ -8,6 +8,7 @@
 #include "mode_octave_arp.h"
 #include "mode_simple_poly.h"
 #include "mode_mega_wave.h"
+#include "mode_octave_cascade.h"
 
 static t_class *septavox_tilde_class;
 
@@ -71,6 +72,7 @@ void *septavox_tilde_new(void) {
     mode_octave_arp_init(&(x->pp6));
     mode_simple_poly_init(&(x->pp6));
     mode_mega_wave_init(&(x->pp6));
+    mode_octave_cascade_init(&(x->pp6));
     
     return (void *)x;  
 }  
@@ -86,7 +88,8 @@ t_int *septavox_tilde_perform(t_int *w) {
         //*out++ = mode_adsr_sample_process(&(x->pp6));
         //*out++ = mode_octave_arp_sample_process(&(x->pp6));
         //*out++ = mode_simple_poly_sample_process(&(x->pp6));
-        *out++ = mode_mega_wave_sample_process(&(x->pp6));
+        //*out++ = mode_mega_wave_sample_process(&(x->pp6));
+        *out++ = mode_octave_cascade_sample_process(&(x->pp6));
     }
     return (w + 4);
 }

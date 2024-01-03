@@ -122,6 +122,16 @@ typedef struct {
     float mode_mega_wave_freqs[4][4];
     float mode_mega_wave_amps[4];
 	uint8_t mode_mega_wave_voices_last[4];
+        
+    sad mode_octave_cascade_amp_env[4];
+    bl_saw mode_octave_cascade_saws[4];
+    bl_square mode_octave_cascade_squares[4];
+    uint32_t  mode_octave_cascade_click;
+    uint32_t mode_octave_cascade_click_count;
+    uint8_t mode_octave_cascade_l;
+	uint8_t mode_octave_cascade_count2;
+	uint8_t mode_octave_cascade_octave_shift[4];
+    uint8_t mode_octave_cascade_midi_clk_last;
 
 } pocket_piano;
 

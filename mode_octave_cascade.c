@@ -5,145 +5,111 @@
  *      Author: owen
  */
 
-
-
-#include "arm_math.h"
-#include "oscillator.h"
 #include "pp6.h"
+#include "oscillator.h"
 #include "line.h"
 #include "sad.h"
 #include "audio.h"
 #include "wave_synth.h"
 #include "mode_octave_cascade.h"
 
-extern pocket_piano pp6;
-
-static sin_oscillator sins[16];
-
-static sad amp_env[4];
-static bl_saw saws[4];
-static bl_square squares[4];
-
-
-static uint32_t  click = 0;
-static uint32_t click_count = 0;
-
-
-
-void mode_octave_cascade_init(void){
+void mode_octave_cascade_init(pocket_piano *pp6){
 	uint8_t i;
 	for (i = 0; i<4; i++){
-		bl_saw_reset(&saws[i]);
-		sad_init(&amp_env[i]);
-		bl_square_init(&squares[i]);
+		bl_saw_reset(&(pp6->mode_octave_cascade_saws[i]));
+		sad_init(&(pp6->mode_octave_cascade_amp_env[i]));
+		bl_square_init(&(pp6->mode_octave_cascade_squares[i]));
+        pp6->mode_octave_cascade_octave_shift[i] = 0;
 	}
+
+    pp6->mode_octave_cascade_click = 0;
+    pp6->mode_octave_cascade_click_count = 0;
+    pp6->mode_octave_cascade_l = 0;
+    pp6->mode_octave_cascade_midi_clk_last = 0;
 }
 
-float32_t mode_octave_cascade_sample_process (void) {
+float mode_octave_cascade_sample_process (pocket_piano *pp6) {
 	uint8_t i;
+    uint8_t midi_clk = pp6_get_midi_clock_count(pp6);
 
-	// process envelopes
+    if (pp6_midi_clock_present(pp6)){
+        if (midi_clk != pp6->mode_octave_cascade_midi_clk_last){
+
+            if (pp6_get_knob_3(pp6) < .25f) {
+                if (!(pp6_get_midi_clock_count(pp6) % 3)) {
+                    pp6->mode_octave_cascade_click = 1;
+                }
+            }
+            else if (pp6_get_knob_3(pp6) < .5f) {
+                if (!(pp6_get_midi_clock_count(pp6) % 6)) {
+                    pp6->mode_octave_cascade_click = 1;
+                }
+            }
+            else if (pp6_get_knob_3(pp6) < .75f) {
+                if (!(pp6_get_midi_clock_count(pp6) % 8)) {
+                    pp6->mode_octave_cascade_click = 1;
+                }
+            }
+            else if (pp6_get_knob_3(pp6) < 1.1f) {
+                if (!(pp6_get_midi_clock_count(pp6) % 12)) {
+                    pp6->mode_octave_cascade_click = 1;
+                }
+            }
+            pp6->mode_octave_cascade_midi_clk_last = midi_clk;
+        }  // a new tick recieved
+    } // midi clock present
+    else {
+        pp6->mode_octave_cascade_click_count++;
+        if (pp6->mode_octave_cascade_click_count > ((10000 * (1 - pp6_get_knob_3(pp6))) + 4) ) {
+            pp6->mode_octave_cascade_click_count = 0;
+            pp6->mode_octave_cascade_click = 1;
+        }
+    }
+
+    if (pp6->mode_octave_cascade_click) {
+        pp6->mode_octave_cascade_click = 0;
+        pp6->mode_octave_cascade_l++;
+        pp6->mode_octave_cascade_l &= 3;
+        // find octave shifts for each voice
+        pp6->mode_octave_cascade_count2++;
+        if (pp6->mode_octave_cascade_count2 > 2) pp6->mode_octave_cascade_count2 = 0;
+
+        // do strage octave shifting  sounds cool,
+        // don't know how it works exactly, you'll have to ask chris
+        if (pp6->mode_octave_cascade_count2 ==0) {
+            for (i = 0; i < 4; i++){
+                pp6->mode_octave_cascade_octave_shift[i] = ((pp6->mode_octave_cascade_l+i) & 3);
+            }
+        }
+        else if (pp6->mode_octave_cascade_count2 == 1) {
+            for (i = 0; i < 4; i++){
+                pp6->mode_octave_cascade_octave_shift[i] =  ((pp6->mode_octave_cascade_l + ((i & 1) * 2)) & 3);
+            }
+        }
+        else if (pp6->mode_octave_cascade_count2 == 2) {
+            for (i = 0; i < 4; i++){
+                pp6->mode_octave_cascade_octave_shift[i] = pp6->mode_octave_cascade_l;
+            }
+        }
+
+        // update synth
+        for (i=0; i<4; i++){
+            if (pp6->voices[i]) {
+                pp6->freqs[i] = c_to_f(pp6->voices[i] * 100) * 2 / (1 << pp6->mode_octave_cascade_octave_shift[i]);
+                sad_set(&(pp6->mode_octave_cascade_amp_env[i]), .01f, (pp6_get_knob_2(pp6) * 2.f) + .01f);
+                sad_go(&(pp6->mode_octave_cascade_amp_env[i]));
+            }
+            else {
+                pp6->freqs[i] = 0.1f;
+            }
+        }
+    }
+
+	// dsp
 	for (i = 0; i < 4; i++) {
-		pp6.amps[i] = sad_process(&amp_env[i]);
-		pp6.amps[i] = pp6.amps[i] * pp6.amps[i];   // square it for fake log
+		pp6->amps[i] = sad_process(&(pp6->mode_octave_cascade_amp_env[i]));
+		pp6->amps[i] = pp6->amps[i] * pp6->amps[i];   
 	}
 
-	return wave_synth_process();
-}
-
-void mode_octave_cascade_control_process (void) {
-
-	uint8_t i = 0;
-	    static uint8_t l = 0;
-	    static uint8_t count2 = 0;
-	    static uint8_t octave_shift[] = {0, 0, 0, 0};
-
-	    //envelopes
-		for (i=0;i<4;i++){
-			//sad_set(&amp_env[i], .01f, (pp6_get_knob_2() * 2.f) + .01f);
-		}
-
-		//click along ,  do it from midi clock , or manual
-		static uint8_t midi_clk_last = 0;
-		uint8_t midi_clk = pp6_get_midi_clock_count();
-
-		if (pp6_midi_clock_present()){
-			if (midi_clk != midi_clk_last){
-
-		        if (pp6_get_knob_3() < .25f) {
-		            if (!(pp6_get_midi_clock_count() % 3)) {
-		                click = 1;
-		            }
-		        }
-		        else if (pp6_get_knob_3() < .5f) {
-		            if (!(pp6_get_midi_clock_count() % 6)) {
-		                click = 1;
-		            }
-		        }
-		        else if (pp6_get_knob_3() < .75f) {
-		            if (!(pp6_get_midi_clock_count() % 8)) {
-		                click = 1;
-		            }
-		        }
-		        else if (pp6_get_knob_3() < 1.1f) {
-		            if (!(pp6_get_midi_clock_count() % 12)) {
-		                click = 1;
-		            }
-		        }
-		        midi_clk_last = midi_clk;
-			}  // a new tick recieved
-		} // midi clock present
-		else {
-		    click_count++;
-		    if (click_count > ((100 * (1 - pp6_get_knob_3())) + 4) ) {
-		    	click_count = 0;
-		    	click = 1;
-		    }
-		}
-
-
-
-
-	    //Pattern #3 - Cycle Through
-
-	    if (click) {
-	        click = 0;
-	        l++;
-	        l &= 3;
-	        // find octave shifts for each voice
-	        count2++;
-	        if (count2 > 2) count2 = 0;
-
-	        // do strage octave shifting  sounds cool,
-	        // don't know how it works exactly, you'll have to ask chris
-	        if (count2 ==0) {
-	            for (i = 0; i < 4; i++){
-	                octave_shift[i] = ((l+i) & 3);
-	            }
-	        }
-	        else if (count2 == 1) {
-	            for (i = 0; i < 4; i++){
-	                octave_shift[i] =  ((l + ((i & 1) * 2)) & 3);
-	            }
-	        }
-	        else if (count2 == 2) {
-	            for (i = 0; i < 4; i++){
-	                octave_shift[i] = l;
-	            }
-	        }
-
-	        // update synth
-	        for (i=0; i<4; i++){
-
-	            if (pp6.voices[i]) {
-		        	pp6.freqs[i] = c_to_f(pp6.voices[i] * 100) * 2 / (1 << octave_shift[i]);
-	             //   oscil_phase_step[i] = ((( (miditof[(voices[i] % 12)]) * tune ) >> 10) << ((voices[i] / 12))) >> octave_shift[i]  ;
-		        	sad_set(&amp_env[i], .01f, (pp6_get_knob_2() * 2.f) + .01f);
-		        	sad_go(&amp_env[i]);
-	            }
-	            else {
-		        	pp6.freqs[i] = 0.1f;
-	            }
-	        }
-	    }
+	return wave_synth_process(pp6);
 }
