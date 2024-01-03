@@ -8,14 +8,12 @@
 #ifndef MODE_SLIDER_H_
 #define MODE_SLIDER_H_
 
-#include "arm_math.h"
+#include "pp6.h"
 
-void mode_slider_init (void);
+void mode_slider_init (pocket_piano *pp6);
 
-float32_t mode_slider_sample_process (void);
+float mode_slider_sample_process (pocket_piano *pp6);
 
-void mode_slider_control_process (void);
-
-void mode_slider_stop_notes(void);
+void mode_slider_stop_notes (pocket_piano *pp6);
 
 #endif /* MODE_SLIDER_H_ */

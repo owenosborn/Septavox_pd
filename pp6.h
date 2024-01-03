@@ -133,6 +133,17 @@ typedef struct {
 	uint8_t mode_octave_cascade_octave_shift[4];
     uint8_t mode_octave_cascade_midi_clk_last;
 
+    line mode_slicer_aramps[4];
+    float mode_slicer_freqs[4];
+    float mode_slicer_amps[4];
+    uint32_t mode_slicer_step;
+    uint32_t mode_slicer_sample_counter;
+    uint8_t mode_slicer_slice_amp;
+    uint8_t mode_slicer_slice_amp_last;
+    line mode_slicer_slice_line;
+    float mode_slicer_sliced;
+    uint8_t mode_slicer_voices_last[4];
+
 } pocket_piano;
 
 void pp6_init(pocket_piano *pp6);

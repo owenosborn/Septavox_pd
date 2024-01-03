@@ -13,13 +13,6 @@
 #include "wave_synth.h"
 #include "line.h"
 
-extern pocket_piano pp6;
-extern uint8_t wavetable_selector;
-
-static line aramps[4];
-static float32_t freqs[4] = {100, 101, 102, 103};
-static float32_t amps[4] = {0, 0, 0, 0};
-
 static uint8_t pattern[9][24] = {
 		{0,0,0,0, 0,0,0,0, 0,0,0,0, 1,1,1,1, 1,1,1,1, 1,1,1,1},
 		{0,0,0,0, 1,1,1,1, 0,0,0,1, 1,1,1,0, 0,1,1,0, 1,0,1,0},
@@ -34,69 +27,68 @@ static uint8_t pattern[9][24] = {
 		{0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0, 0,0,0,1,}
 };
 
-static uint32_t step = 0;
-static uint32_t sample_counter = 0;
-static uint8_t slice_amp = 0;
-static uint8_t slice_amp_last = 0;
-static line slice_line;
-static float32_t sliced;
-
-void mode_slicer_init(void){
-	line_set(&slice_line, 0);
-}
-
-float32_t mode_slicer_sample_process (void) {
+void mode_slicer_init(pocket_piano *pp6){
 	uint8_t i;
 
-	// pattern slice
+    line_set(&(pp6->mode_slicer_slice_line), 0);
+
+    pp6->mode_slicer_step = 0;
+    pp6->mode_slicer_sample_counter = 0;
+    pp6->mode_slicer_slice_amp = 0;
+    pp6->mode_slicer_slice_amp_last = 0;
+	
+    for (i = 0; i<4; i++){
+        pp6->mode_slicer_voices_last[i] = 0;
+        pp6->mode_slicer_amps[i] = 0;
+    }
+}
+
+float mode_slicer_sample_process (pocket_piano *pp6) {
+	uint8_t i;
+
+	for (i=0;i<4;i++){
+		if (pp6->voices[i] != pp6->mode_slicer_voices_last[i]){
+			if (pp6->voices[i]) {
+				pp6->mode_slicer_freqs[i] = c_to_f(pp6->voices[i] * 100) * 2;
+				line_go(&(pp6->mode_slicer_aramps[i]), 1, 5);
+
+			}
+			else {
+				pp6->mode_slicer_freqs[i] = 0.1f;
+				line_go(&(pp6->mode_slicer_aramps[i]), 0, 20);
+			}
+			pp6->mode_slicer_voices_last[i] = pp6->voices[i];
+		}
+	}
 
 	//click along ,  do it from midi clock , or manual
-	if (pp6_midi_clock_present()){
-		step = pp6_get_midi_clock_count();
+	if (pp6_midi_clock_present(pp6)){
+		pp6->mode_slicer_step = pp6_get_midi_clock_count(pp6);
 	}
 	else {
-		sample_counter++;
+		pp6->mode_slicer_sample_counter++;
 
-		if (sample_counter > ((1 - pp6_get_knob_3()) * 500.f)){
-			sample_counter = 0;
-			step++;
-			if (step == 24) step = 0;
+		if (pp6->mode_slicer_sample_counter > ((1 - pp6_get_knob_3(pp6)) * 500.f)){
+			pp6->mode_slicer_sample_counter = 0;
+			pp6->mode_slicer_step++;
+			if (pp6->mode_slicer_step == 24) pp6->mode_slicer_step = 0;
 		}
 	}
 
 	for (i = 0; i < 4; i++) {
-		pp6.freqs[i] = freqs[i];
-		pp6.amps[i] = line_process(&aramps[i]);
+		pp6->freqs[i] = pp6->mode_slicer_freqs[i];
+		pp6->amps[i] = line_process(&(pp6->mode_slicer_aramps[i]));
 	}
 
-	slice_amp = (float32_t)pattern[(uint8_t)(pp6_get_knob_2() * 9)][step];
+	pp6->mode_slicer_slice_amp = (float)pattern[(uint8_t)(pp6_get_knob_2(pp6) * 9)][pp6->mode_slicer_step];
 
-	if (slice_amp != slice_amp_last){
-		line_go(&slice_line, (float32_t)slice_amp, 3.f);
-		slice_amp_last = slice_amp;
+	if (pp6->mode_slicer_slice_amp != pp6->mode_slicer_slice_amp_last){
+		line_go(&(pp6->mode_slicer_slice_line), (float)pp6->mode_slicer_slice_amp, 3.f);
+		pp6->mode_slicer_slice_amp_last = pp6->mode_slicer_slice_amp;
 	}
-	sliced = line_process(&slice_line);
+	pp6->mode_slicer_sliced = line_process(&(pp6->mode_slicer_slice_line));
 
-	return wave_synth_process() * sliced;
+	return wave_synth_process(pp6) * pp6->mode_slicer_sliced;
 }
 
-void mode_slicer_control_process (void) {
-	uint8_t i;
-	static uint8_t voices_last[] = {0,0,0,0};
 
-	for (i=0;i<4;i++){
-		if (pp6.voices[i] != voices_last[i]){
-			if (pp6.voices[i]) {
-				freqs[i] = c_to_f(pp6.voices[i] * 100) * 2;
-				line_go(&aramps[i], 1, 5);
-
-			}
-			else {
-
-				freqs[i] = 0.1f;
-				line_go(&aramps[i], 0, 20);
-			}
-			voices_last[i] = pp6.voices[i];
-		}
-	}
-}
