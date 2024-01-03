@@ -15,10 +15,8 @@
 
 
 extern pocket_piano pp6;
-
 static sadsr amp_env[4];
 static line framps[4];
-
 static uint32_t note_dur[4] = {0,0,0,0};
 
 void mode_slider_init(void){

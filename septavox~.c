@@ -14,9 +14,7 @@ static t_class *septavox_tilde_class;
 
 typedef struct _septavox_tilde {  
     t_object  x_obj; 
-    t_int i_note_out;
-    t_int i_note_num;
-    t_int i_note_vel;
+    uint8_t mode;
     t_outlet *out; 
     pocket_piano pp6;
 } t_septavox_tilde;  
@@ -42,8 +40,20 @@ void septavox_tilde_freq0(t_septavox_tilde *x, t_floatarg freq) {
 //    x->pp6.freqs[0] = freq;
 }
 
-void septavox_tilde_waveform(t_septavox_tilde *x, t_floatarg num) {  
-    x->pp6.aux_button_count = (uint8_t)num;
+void septavox_tilde_waveform(t_septavox_tilde *x, t_floatarg num) { 
+    uint8_t tmp;
+    tmp = (uint8_t)num;
+    if (tmp <= 0) tmp = 0;
+    if (tmp >= 6) tmp = 0;
+    x->pp6.aux_button_count = tmp;
+}
+
+void septavox_tilde_mode(t_septavox_tilde *x, t_floatarg num) { 
+    uint8_t tmp;
+    tmp = (uint8_t)num;
+    if (tmp <= 0) tmp = 0;
+    if (tmp >= 4) tmp = 4;
+    x->mode = tmp;
 }
 
 void septavox_tilde_knob1(t_septavox_tilde *x, t_floatarg k) {  
@@ -74,6 +84,8 @@ void *septavox_tilde_new(void) {
     mode_mega_wave_init(&(x->pp6));
     mode_octave_cascade_init(&(x->pp6));
     
+    x->mode = 0;
+    
     return (void *)x;  
 }  
 
@@ -83,13 +95,12 @@ t_int *septavox_tilde_perform(t_int *w) {
     int n = (int)(w[3]);
 
     while (n--) {
-
-        //*out++ = wave_synth_process(&(x->pp6));
-        //*out++ = mode_adsr_sample_process(&(x->pp6));
-        //*out++ = mode_octave_arp_sample_process(&(x->pp6));
-        //*out++ = mode_simple_poly_sample_process(&(x->pp6));
-        //*out++ = mode_mega_wave_sample_process(&(x->pp6));
-        *out++ = mode_octave_cascade_sample_process(&(x->pp6));
+        // *out++ = wave_synth_process(&(x->pp6));
+        if (x->mode == 0) *out++ = mode_adsr_sample_process(&(x->pp6));
+        if (x->mode == 1) *out++ = mode_octave_arp_sample_process(&(x->pp6));
+        if (x->mode == 2) *out++ = mode_simple_poly_sample_process(&(x->pp6));
+        if (x->mode == 3) *out++ = mode_mega_wave_sample_process(&(x->pp6));
+        if (x->mode == 4) *out++ = mode_octave_cascade_sample_process(&(x->pp6));
     }
     return (w + 4);
 }
@@ -106,6 +117,7 @@ void septavox_tilde_setup(void) {
     class_addbang(septavox_tilde_class, septavox_tilde_bang);  
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_notein, gensym("notein"), A_DEFFLOAT, A_DEFFLOAT, 0);  
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_waveform, gensym("waveform"), A_DEFFLOAT, 0);  
+    class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_mode, gensym("mode"), A_DEFFLOAT, 0);  
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_knob1, gensym("knob1"), A_DEFFLOAT, 0);  
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_knob2, gensym("knob2"), A_DEFFLOAT, 0);  
     class_addmethod(septavox_tilde_class, (t_method)septavox_tilde_knob3, gensym("knob3"), A_DEFFLOAT, 0);  
