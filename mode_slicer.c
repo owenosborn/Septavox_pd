@@ -68,7 +68,7 @@ float mode_slicer_sample_process (pocket_piano *pp6) {
 	else {
 		pp6->mode_slicer_sample_counter++;
 
-		if (pp6->mode_slicer_sample_counter > ((1 - pp6_get_knob_3(pp6)) * 500.f)){
+		if (pp6->mode_slicer_sample_counter > ((1 - pp6_get_knob_3(pp6)) * 5000.f)){
 			pp6->mode_slicer_sample_counter = 0;
 			pp6->mode_slicer_step++;
 			if (pp6->mode_slicer_step == 24) pp6->mode_slicer_step = 0;
