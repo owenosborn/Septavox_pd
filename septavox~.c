@@ -10,6 +10,7 @@
 #include "mode_mega_wave.h"
 #include "mode_octave_cascade.h"
 #include "mode_slicer.h"
+#include "mode_slider.h"
 
 static t_class *septavox_tilde_class;
 
@@ -53,7 +54,7 @@ void septavox_tilde_mode(t_septavox_tilde *x, t_floatarg num) {
     uint8_t tmp;
     tmp = (uint8_t)num;
     if (tmp <= 0) tmp = 0;
-    if (tmp >= 5) tmp = 5;
+    if (tmp >= 6) tmp = 6;
     x->mode = tmp;
 }
 
@@ -85,6 +86,7 @@ void *septavox_tilde_new(void) {
     mode_mega_wave_init(&(x->pp6));
     mode_octave_cascade_init(&(x->pp6));
     mode_slicer_init(&(x->pp6));
+    mode_slider_init(&(x->pp6));
     
     x->mode = 0;
     
@@ -104,6 +106,7 @@ t_int *septavox_tilde_perform(t_int *w) {
         if (x->mode == 3) *out++ = mode_mega_wave_sample_process(&(x->pp6));
         if (x->mode == 4) *out++ = mode_octave_cascade_sample_process(&(x->pp6));
         if (x->mode == 5) *out++ = mode_slicer_sample_process(&(x->pp6));
+        if (x->mode == 6) *out++ = mode_slider_sample_process(&(x->pp6));
     }
     return (w + 4);
 }

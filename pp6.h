@@ -144,6 +144,11 @@ typedef struct {
     float mode_slicer_sliced;
     uint8_t mode_slicer_voices_last[4];
 
+    sadsr mode_slider_amp_env[4];
+    uint8_t mode_slider_voices_last[4];
+    uint32_t mode_slider_note_dur[4];
+    line mode_slider_framps[4];
+
 } pocket_piano;
 
 void pp6_init(pocket_piano *pp6);
