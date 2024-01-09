@@ -100,13 +100,13 @@ t_int *septavox_tilde_perform(t_int *w) {
 
     while (n--) {
         // *out++ = wave_synth_process(&(x->pp6));
-        if (x->mode == 0) *out++ = mode_adsr_sample_process(&(x->pp6));
-        if (x->mode == 1) *out++ = mode_octave_arp_sample_process(&(x->pp6));
-        if (x->mode == 2) *out++ = mode_simple_poly_sample_process(&(x->pp6));
-        if (x->mode == 3) *out++ = mode_mega_wave_sample_process(&(x->pp6));
+        if (x->mode == 0) *out++ = mode_simple_poly_sample_process(&(x->pp6));
+        if (x->mode == 1) *out++ = mode_slider_sample_process(&(x->pp6));
+        if (x->mode == 2) *out++ = mode_octave_arp_sample_process(&(x->pp6));
+        if (x->mode == 3) *out++ = mode_adsr_sample_process(&(x->pp6));
         if (x->mode == 4) *out++ = mode_octave_cascade_sample_process(&(x->pp6));
         if (x->mode == 5) *out++ = mode_slicer_sample_process(&(x->pp6));
-        if (x->mode == 6) *out++ = mode_slider_sample_process(&(x->pp6));
+        if (x->mode == 6) *out++ = mode_mega_wave_sample_process(&(x->pp6));
     }
     return (w + 4);
 }
