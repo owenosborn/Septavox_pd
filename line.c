@@ -15,7 +15,7 @@ void line_go(line * line, float v, float t){
 
 	line->target = v;
 
-	line->num_steps = (t / 1000.f) * KR;
+	line->num_steps = (t / 1000.f) * SR;
 
 	// ammount i'm stepping
 	line->step_slope = (line->target - line->value) / (float)line->num_steps;
@@ -36,10 +36,4 @@ float line_process(line * line){
 	}
 
 	return line->value;
-}
-
-
-
-uint32_t line_is_processing(line * line){
-	return 0;
 }

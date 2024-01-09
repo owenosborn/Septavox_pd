@@ -32,8 +32,6 @@ void mode_slider_stop_notes(pocket_piano *pp6){
 
 float mode_slider_sample_process (pocket_piano *pp6) {
 	uint8_t i;
-	float vibrato;
-	uint8_t tmpwav;
 	float cents;
 	float quickly;
 
