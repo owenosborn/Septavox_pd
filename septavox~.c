@@ -17,8 +17,15 @@ static t_class *septavox_tilde_class;
 typedef struct _septavox_tilde {  
     t_object  x_obj; 
     uint8_t mode;
-    t_outlet *out; 
-    pocket_piano pp6;
+    t_outlet *out;
+
+    // pp6 is the main data structure storing the state of the instrument.
+    // In the original program, which runs on a microcontroller, all of 
+    // the mode_ files contained tons of static variables.
+    // So the quick and dirty thing to do is stuff all those in pp6 since it 
+    // is already getting passed around. 
+    pocket_piano pp6; 
+
 } t_septavox_tilde;  
 
 void septavox_tilde_bang(t_septavox_tilde *x) {
@@ -72,9 +79,6 @@ void septavox_tilde_knob3(t_septavox_tilde *x, t_floatarg k) {
 
 void *septavox_tilde_new(void) {  
     t_septavox_tilde *x = (t_septavox_tilde *)pd_new(septavox_tilde_class);  
-    
-    //inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("notein"));
-    //inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("waveform"));
 
     x->out = outlet_new(&x->x_obj, &s_signal);
 

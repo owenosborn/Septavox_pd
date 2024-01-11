@@ -1,4 +1,4 @@
-#N canvas -10 35 899 708 12;
+#N canvas 211 28 899 708 12;
 #X obj 342 627 dac~;
 #X floatatom 445 305 5 0 0 0 - - - 0;
 #X msg 446 360 waveform \$1;
@@ -66,7 +66,6 @@
 #X text 465 233 square;
 #X text 466 249 saw;
 #X text 466 264 dirty square;
-#X text 466 280 dirty square;
 #X text 443 156 WAVEFORM;
 #X text 643 120 KNOBS (range 0-1);
 #X text 78 154 NOTES;
@@ -78,6 +77,7 @@
 #X text 349 243 oct cascade;
 #X text 349 258 slicer;
 #X text 349 274 pipe glide;
+#X text 466 280 computer;
 #X connect 1 0 20 0;
 #X connect 2 0 15 0;
 #X connect 3 0 16 0;

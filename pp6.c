@@ -307,14 +307,6 @@ void pp6_flash_update(pocket_piano *pp6) {
 	}
 }
 
-
-// keys
-
-uint32_t pp6_get_keys(pocket_piano *pp6) {
-		return pp6->keys;
-}
-
-
 // key scanning and assignment, this must be called after pp6_keys_update()
 void pp6_get_key_events(pocket_piano *pp6) {
 

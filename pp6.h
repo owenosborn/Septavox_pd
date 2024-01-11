@@ -183,7 +183,6 @@ void pp6_clear_flags(pocket_piano *pp6);
 
 uint8_t pp6_is_playing (pocket_piano *pp6);
 
-uint32_t pp6_get_keys(pocket_piano *pp6);   // returns the current key status
 uint8_t pp6_get_num_keys_down(pocket_piano *pp6);
 void pp6_get_key_events(pocket_piano *pp6);  // checks keys for new events
 void pp6_allocate_voices(pocket_piano *pp6);
